@@ -1,31 +1,41 @@
-Package: templateR
+Package: phenomix.core
 Type: Package
-Title: packageTitle
+Title: Core functions for the phenomix R package
 Version: 0.99.0
-Authors@R: c( 
-     person(given = "yourGivenName",
-           family = "yourFamilyName",
-           role = c("cre"),
-           email = "yourEmail@email.com",
-           comment = c(ORCID = "yourOrcidId"))
-    )
+Authors@R:
+    c(
+    person(given = "Brian",
+           family = "Schilder",
+           role = c("aut","cre"),
+           email = "brian_schilder@alumni.brown.edu",
+           comment = c(ORCID = "0000-0001-5949-2191"))
+           )
 Description: packageDescription.
-URL: https://github.com/neurogenomics/templateR
-BugReports: https://github.com/neurogenomics/templateR/issues
+URL: https://github.com/neurogenomics/phenomix.core
+BugReports: https://github.com/neurogenomics/phenomix.core/issues
 Encoding: UTF-8
 Depends: R (>= 4.2)
 biocViews:
 Imports:
-Suggests:
-    rworkflows,
     methods,
+    Matrix,
+    broom,
+    data.table,
+    BiocParallel,
+    parallel,
+    rstatix,
+    dplyr
+Suggests: 
     markdown,
     rmarkdown,
     remotes,
     knitr,
     testthat (>= 3.0.0),
-    utils
-RoxygenNote: 7.2.3
+    utils,
+    MASS,
+    DelayedArray,
+    GeneOverlap
+RoxygenNote: 7.3.2
 VignetteBuilder: knitr
 License: GPL-3
 Config/testthat/edition: 3
