@@ -22,7 +22,7 @@ README updated: <i>Aug-03-2025</i>
 
 ## `phenomix.core`: Core phenomix functions.
 
-### Core functions for the [phenomix](https://github.com/neurogenomics/phenomix.core) R package.
+### Core functions for the [phenomix](https://github.com/neurogenomics/phenomix) R package.
 
 ## Installation
 

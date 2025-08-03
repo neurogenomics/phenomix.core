@@ -10,7 +10,7 @@ Authors@R:
            email = "brian_schilder@alumni.brown.edu",
            comment = c(ORCID = "0000-0001-5949-2191"))
            )
-Description: Core functions for the [phenomix](https://github.com/neurogenomics/phenomix.core) R package.
+Description: Core functions for the [phenomix](https://github.com/neurogenomics/phenomix) R package.
 URL: https://github.com/neurogenomics/phenomix.core
 BugReports: https://github.com/neurogenomics/phenomix.core/issues
 Encoding: UTF-8
