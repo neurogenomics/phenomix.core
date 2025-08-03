@@ -7,7 +7,15 @@
 <url><loc>/index.html</loc></url>
 <url><loc>/news/index.html</loc></url>
 <url><loc>/reference/index.html</loc></url>
+<url><loc>/reference/iterate_gsea.html</loc></url>
+<url><loc>/reference/iterate_lm.html</loc></url>
 <url><loc>/reference/messager.html</loc></url>
+<url><loc>/reference/quantize_matrix.html</loc></url>
+<url><loc>/reference/quantize_vector.html</loc></url>
+<url><loc>/reference/run_pca.html</loc></url>
+<url><loc>/reference/set_cores.html</loc></url>
+<url><loc>/reference/simulate_matrix.html</loc></url>
 <url><loc>/reference/stopper.html</loc></url>
+<url><loc>/reference/to_sparse.html</loc></url>
 </urlset>
 
