@@ -20,16 +20,9 @@ README updated: <i>Aug-03-2025</i>
 
 <!-- To modify Package/Title/Description/Authors fields, edit the DESCRIPTION file -->
 
-## `phenomix.core`: Core functions for the phenomix R package
+## `phenomix.core`: Core phenomix functions.
 
-### packageDescription.
-
-If you use `phenomix.core`, please cite:
-
-<!-- Modify this by editing the file: inst/CITATION  -->
-
-> author1, author2, author3 (publicationYear) articleTitle,
-> *journalName*; volumeNumber, [linkToPublication](linkToPublication)
+### Core functions for the [phenomix](https://github.com/neurogenomics/phenomix.core) R package.
 
 ## Installation
 
