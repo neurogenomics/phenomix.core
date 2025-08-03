@@ -1,19 +1,10 @@
 #' Iterate GSEA
 #' 
 #' Iterate Gene Set Enrichment Analysis (GSEA) across all traits and cell types.
-#'
-#' @param xmat gene x cell type matrix.
-#' @param ymat gene x trait matrix.
-#' @param correction_method Multiple-testing correction method 
-#' to be passed to \code{stats::p.adjust}.
-#' @param qvalue_thresh q.value threshold to use when report 
-#' significant results summary.
-#' @param x_quantiles The number of quantiles to bin \code{ymat} data into.
-#' @param y_quantiles The number of quantiles to bin \code{ymat} data into.
-#' @param use_quantiles Which quantiles in to use in 
-#' \code{xmat} and \code{ymat}.
-#' @param nCores Number of cores to use in parallel. 
-#' Will optimize if \code{NULL}.
+#' @param use_quantiles Which quantiles in to use when filtering genes in each column of  
+#' \code{xmat} and \code{ymat}. 
+#' @inheritParams iterate_lm
+#' @inheritParams set_cores
 #' 
 #' @return \code{data.table} of enrichment results. 
 #' 
@@ -35,48 +26,77 @@
 #'
 #' res_gsea <- iterate_gsea(xmat = xmat,
 #'                          ymat = ymat,
-#'                          nCores = 1)
+#'                          workers = 1)
 iterate_gsea <- function(xmat,
                          ymat,
                          correction_method = "BH",
                          qvalue_thresh = .05,
-                         x_quantiles = 10,
-                         y_quantiles = 10,
-                         use_quantiles = 10,
-                         nCores = 1) {
+                         quantize = list(x=10,
+                                         y=10),
+                         use_quantiles = list(x=2,
+                                              y=2),
+                         progressbar = TRUE,
+                         workers = 1,
+                         verbose = TRUE) {
     requireNamespace("GeneOverlap")
+    x <- y <- p <- q <- NULL;
     
-    trait <- celltype <- p.value <- qvalue <- NULL;
-    gene_intersect <- intersect(rownames(xmat), rownames(ymat))
-    message(length(gene_intersect), 
-            " intersecting genes between GWAS and CTD matrices.")
-    ### Run lm  for all celltypes against this trait
+    data.table::setDTthreads(threads = 1)
+    BPPARAM <- set_cores(workers = workers,
+                         progressbar = progressbar,
+                         verbose = verbose)
+    
+    ## Filter data
+    X_list <- filter_matrices(X_list = list(xmat=xmat,
+                                            ymat=ymat),
+                              verbose = verbose)
+    xmat <- X_list$xmat
+    ymat <- X_list$ymat
+    
+    ### Run lm for all combinations of xmat and ymat
     messager(
-        "Running ", formatC(ncol(xmat) * ncol(ymat), big.mark = ","),
-        " tests: ", formatC(ncol(xmat), big.mark = ","), " traits x ",
-        formatC(ncol(ymat), big.mark = ","), " celltypes."
+        "Running", formatC(ncol(xmat) * ncol(ymat), big.mark = ","),
+        "tests:", formatC(ncol(xmat), big.mark = ","), "xmat columns x",
+        formatC(ncol(ymat), big.mark = ","), "ymat columns.",v=verbose
     )
+    ## Quantize data
+    if(is.numeric(quantize$x)){
+        xmat <- quantize_matrix(X=xmat,
+                                n=quantize$x,
+                                verbose = verbose)
+    }
+    if(is.numeric(quantize$y)){
+        ymat <- quantize_matrix(X=ymat,
+                                n=quantize$y,
+                                verbose = verbose)
+    }
 
-    gsea_res <- parallel::mclapply(1:ncol(xmat), function(i) {
-        tt <- colnames(xmat)[i]
-        messager(" - ", tt, ": (", i, "/", ncol(xmat), ")", parallel=TRUE)
-        lapply(colnames(ymat), function(ct) { 
+    
+    gsea_res <- BiocParallel::bplapply(
+        BPPARAM = BPPARAM,
+        X = stats::setNames(seq(ncol(ymat)),
+                            colnames(ymat)), 
+        FUN = function(i) {
+            
+        tt <- colnames(ymat)[i]
+        if(!progressbar){
+            messager("-",tt,": (",i,"/",ncol(xmat),")",
+                     parallel=TRUE)
+        }
+        
+        lapply(colnames(xmat), function(ct) { 
             dat <- data.frame(
-                trait = cut(xmat[gene_intersect, tt], 
-                            breaks = x_quantiles, 
-                            labels = 1:x_quantiles),
-                celltype = cut(ymat[gene_intersect, ct], 
-                               breaks = y_quantiles, 
-                               labels = 1:y_quantiles),
-                row.names = gene_intersect
+                x = xmat[X_list$features, ct],
+                y = ymat[X_list$features, tt],
+                row.names = X_list$features
             )
             res <- GeneOverlap::newGeneOverlap(
-                listA = rownames(subset(dat, trait %in% use_quantiles)),
-                listB = rownames(subset(dat, celltype %in% use_quantiles))
+                listA = rownames(subset(dat, x %in% use_quantiles$x)),
+                listB = rownames(subset(dat, y %in% use_quantiles$y))
             ) |>
                 GeneOverlap::testGeneOverlap()
             res_df <- data.frame(
-                term = ct,
+                xvar = ct,
                 trait_genes = length(res@listA),
                 celltype_genes = length(res@listB),
                 intersection = length(res@intersection),
@@ -84,24 +104,21 @@ iterate_gsea <- function(xmat,
                 genome.size = length(res@genome.size),
                 odds.ratio = res@odds.ratio,
                 Jaccard = res@Jaccard,
-                p.value = res@pval
+                p = res@pval
             )
             return(res_df)
         }) |> data.table::rbindlist()
-    }, mc.cores = nCores) |>
-        `names<-`(colnames(xmat)) |>
-        data.table::rbindlist(idcol = "trait")
+    }) |> 
+        data.table::rbindlist(idcol = "yvar")
 
     ### Multiple-testing correction
     gsea_res <- gsea_res |>
-        dplyr::mutate(qvalue = stats::p.adjust(p = p.value,
-                                               method = correction_method)) |>
-        dplyr::rename(pvalue = p.value)
+        dplyr::mutate(q = stats::p.adjust(p = p,
+                                          method = correction_method))  
     ### Filter only sig results
-    sig_res <- gsea_res |>
-        subset(qvalue < qvalue_thresh)
+    sig_res <- subset(gsea_res, q < qvalue_thresh)
     messager("\n", formatC(nrow(sig_res), big.mark = ","),
-            " significant results @ ", 
+            "significant results @ ", 
             correction_method, "<", qvalue_thresh)
     ### Return FULL results (not just sig)
     return(gsea_res)

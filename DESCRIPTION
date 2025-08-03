@@ -1,6 +1,6 @@
 Package: phenomix.core
 Type: Package
-Title: Core phenomix functions.
+Title: Core phenomix functions
 Version: 0.99.0
 Authors@R:
     c(

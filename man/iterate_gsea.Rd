@@ -9,32 +9,40 @@ iterate_gsea(
   ymat,
   correction_method = "BH",
   qvalue_thresh = 0.05,
-  x_quantiles = 10,
-  y_quantiles = 10,
-  use_quantiles = 10,
-  nCores = 1
+  quantize = list(x = 10, y = 10),
+  use_quantiles = list(x = 2, y = 2),
+  progressbar = TRUE,
+  workers = 1,
+  verbose = TRUE
 )
 }
 \arguments{
-\item{xmat}{gene x cell type matrix.}
+\item{xmat}{gene x trait matrix.}
 
-\item{ymat}{gene x trait matrix.}
+\item{ymat}{gene x celltype matrix.}
 
-\item{correction_method}{Multiple-testing correction method 
-to be passed to \code{stats::p.adjust}.}
+\item{correction_method}{Multiple-testing correction
+method to be passed to \link[stats]{p.adjust}.}
 
-\item{qvalue_thresh}{q.value threshold to use when report 
+\item{qvalue_thresh}{q-value threshold to use when report
 significant results summary.}
 
-\item{x_quantiles}{The number of quantiles to bin \code{ymat} data into.}
+\item{quantize}{A named list where the values of "x" and "y" indicate the
+number of quantiles to bin the respective \code{xmat} and
+\code{ymat} datasets into.}
 
-\item{y_quantiles}{The number of quantiles to bin \code{ymat} data into.}
-
-\item{use_quantiles}{Which quantiles in to use in 
+\item{use_quantiles}{Which quantiles in to use when filtering genes in each column of
 \code{xmat} and \code{ymat}.}
 
-\item{nCores}{Number of cores to use in parallel. 
-Will optimize if \code{NULL}.}
+\item{progressbar}{logical(1) Enable progress bar
+(based on \code{plyr:::progress_text}).
+ Enabling the progress bar changes the default value of tasks to
+ \code{.Machine$integer.max}, so that progress is reported for
+ each element of X.}
+
+\item{workers}{Number (>1) or proportion (<1) of worker cores to use.}
+
+\item{verbose}{Print messages.}
 }
 \value{
 \code{data.table} of enrichment results.
@@ -53,5 +61,5 @@ ymat <- simulate_matrix(nrow = 100, ncol = 50, col_prefix="phenotype_")
 
 res_gsea <- iterate_gsea(xmat = xmat,
                          ymat = ymat,
-                         nCores = 1)
+                         workers = 1)
 }

@@ -3,11 +3,12 @@ filter_matrices <- function(X_list,
                             rown_min = 1,
                             colsum_min = 0,
                             rowsum_min = 0,
+                            return_features = TRUE,
                             verbose = TRUE){
 
   features <- feature_intersect(X_list,
                                 verbose = verbose)
-  lapply(X_list, function(x){
+  out <- lapply(X_list, function(x){
     filter_matrix(x,
                   coln_min = coln_min,
                   rown_min = rown_min,
@@ -15,4 +16,8 @@ filter_matrices <- function(X_list,
                   rowsum_min = rowsum_min,
                   features = features)
   })
+  if (return_features) {
+    out$features <- features
+  }
+  return(out)
 }
