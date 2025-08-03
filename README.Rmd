@@ -21,10 +21,10 @@ repo <- strsplit(URL,"/")[[1]][5]
 
 ### `r gsub("\n","",description)`
  
-If you use ``r pkg``, please cite: 
+<!-- If you use ``r pkg``, please cite:  -->
 
-<!-- Modify this by editing the file: inst/CITATION  -->
-> `r utils::citation(pkg)$textVersion`
+<!-- <!-- Modify this by editing the file: inst/CITATION  --> -->
+<!-- > `r utils::citation(pkg)$textVersion` -->
 
 ## Installation 
 
