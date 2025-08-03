@@ -71,10 +71,11 @@
 <span>  <span class="va">ymat</span>,</span>
 <span>  correction_method <span class="op">=</span> <span class="st">"BH"</span>,</span>
 <span>  qvalue_thresh <span class="op">=</span> <span class="fl">0.05</span>,</span>
-<span>  x_quantiles <span class="op">=</span> <span class="fl">10</span>,</span>
-<span>  y_quantiles <span class="op">=</span> <span class="fl">10</span>,</span>
-<span>  use_quantiles <span class="op">=</span> <span class="fl">10</span>,</span>
-<span>  nCores <span class="op">=</span> <span class="fl">1</span></span>
+<span>  quantize <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/list.html" class="external-link">list</a></span><span class="op">(</span>x <span class="op">=</span> <span class="fl">10</span>, y <span class="op">=</span> <span class="fl">10</span><span class="op">)</span>,</span>
+<span>  use_quantiles <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/list.html" class="external-link">list</a></span><span class="op">(</span>x <span class="op">=</span> <span class="fl">2</span>, y <span class="op">=</span> <span class="fl">2</span><span class="op">)</span>,</span>
+<span>  progressbar <span class="op">=</span> <span class="cn">TRUE</span>,</span>
+<span>  workers <span class="op">=</span> <span class="fl">1</span>,</span>
+<span>  verbose <span class="op">=</span> <span class="cn">TRUE</span></span>
 <span><span class="op">)</span></span></code></pre></div>
     </div>
 
@@ -83,39 +84,48 @@
 
 
 <dl><dt id="arg-xmat">xmat<a class="anchor" aria-label="anchor" href="#arg-xmat"></a></dt>
-<dd><p>gene x cell type matrix.</p></dd>
-
-
-<dt id="arg-ymat">ymat<a class="anchor" aria-label="anchor" href="#arg-ymat"></a></dt>
 <dd><p>gene x trait matrix.</p></dd>
 
 
+<dt id="arg-ymat">ymat<a class="anchor" aria-label="anchor" href="#arg-ymat"></a></dt>
+<dd><p>gene x celltype matrix.</p></dd>
+
+
 <dt id="arg-correction-method">correction_method<a class="anchor" aria-label="anchor" href="#arg-correction-method"></a></dt>
-<dd><p>Multiple-testing correction method
-to be passed to <code><a href="https://rdrr.io/r/stats/p.adjust.html" class="external-link">stats::p.adjust</a></code>.</p></dd>
+<dd><p>Multiple-testing correction
+method to be passed to <a href="https://rdrr.io/r/stats/p.adjust.html" class="external-link">p.adjust</a>.</p></dd>
 
 
 <dt id="arg-qvalue-thresh">qvalue_thresh<a class="anchor" aria-label="anchor" href="#arg-qvalue-thresh"></a></dt>
-<dd><p>q.value threshold to use when report
+<dd><p>q-value threshold to use when report
 significant results summary.</p></dd>
 
 
-<dt id="arg-x-quantiles">x_quantiles<a class="anchor" aria-label="anchor" href="#arg-x-quantiles"></a></dt>
-<dd><p>The number of quantiles to bin <code>ymat</code> data into.</p></dd>
-
-
-<dt id="arg-y-quantiles">y_quantiles<a class="anchor" aria-label="anchor" href="#arg-y-quantiles"></a></dt>
-<dd><p>The number of quantiles to bin <code>ymat</code> data into.</p></dd>
+<dt id="arg-quantize">quantize<a class="anchor" aria-label="anchor" href="#arg-quantize"></a></dt>
+<dd><p>A named list where the values of "x" and "y" indicate the
+number of quantiles to bin the respective <code>xmat</code> and
+<code>ymat</code> datasets into.</p></dd>
 
 
 <dt id="arg-use-quantiles">use_quantiles<a class="anchor" aria-label="anchor" href="#arg-use-quantiles"></a></dt>
-<dd><p>Which quantiles in to use in
+<dd><p>Which quantiles in to use when filtering genes in each column of
 <code>xmat</code> and <code>ymat</code>.</p></dd>
 
 
-<dt id="arg-ncores">nCores<a class="anchor" aria-label="anchor" href="#arg-ncores"></a></dt>
-<dd><p>Number of cores to use in parallel.
-Will optimize if <code>NULL</code>.</p></dd>
+<dt id="arg-progressbar">progressbar<a class="anchor" aria-label="anchor" href="#arg-progressbar"></a></dt>
+<dd><p>logical(1) Enable progress bar
+(based on <code>plyr:::progress_text</code>).
+ Enabling the progress bar changes the default value of tasks to
+ <code>.Machine$integer.max</code>, so that progress is reported for
+ each element of X.</p></dd>
+
+
+<dt id="arg-workers">workers<a class="anchor" aria-label="anchor" href="#arg-workers"></a></dt>
+<dd><p>Number (&gt;1) or proportion (&lt;1) of worker cores to use.</p></dd>
+
+
+<dt id="arg-verbose">verbose<a class="anchor" aria-label="anchor" href="#arg-verbose"></a></dt>
+<dd><p>Print messages.</p></dd>
 
 </dl></div>
     <div id="value">
@@ -135,12 +145,17 @@ Will optimize if <code>NULL</code>.</p></dd>
 <span class="r-in"><span></span></span>
 <span class="r-in"><span><span class="va">res_gsea</span> <span class="op">&lt;-</span> <span class="fu">iterate_gsea</span><span class="op">(</span>xmat <span class="op">=</span> <span class="va">xmat</span>,</span></span>
 <span class="r-in"><span>                         ymat <span class="op">=</span> <span class="va">ymat</span>,</span></span>
-<span class="r-in"><span>                         nCores <span class="op">=</span> <span class="fl">1</span><span class="op">)</span></span></span>
+<span class="r-in"><span>                         workers <span class="op">=</span> <span class="fl">1</span><span class="op">)</span></span></span>
 <span class="r-msg co"><span class="r-pr">#&gt;</span> Loading required namespace: GeneOverlap</span>
-<span class="r-msg co"><span class="r-pr">#&gt;</span> 100 intersecting genes between GWAS and CTD matrices.</span>
-<span class="r-msg co"><span class="r-pr">#&gt;</span> Running  500  tests:  10  traits x  50  celltypes.</span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> 1 core(s) assigned as workers (3 reserved).</span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> 100 intersecting features between all matrices.</span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> Running 500 tests: 10 xmat columns x 50 ymat columns.</span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> Converting obj to sparseMatrix.</span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> Converting obj to sparseMatrix.</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>   |                                                                              |                                                                      |   0%  |                                                                              |=                                                                     |   2%  |                                                                              |===                                                                   |   4%  |                                                                              |====                                                                  |   6%  |                                                                              |======                                                                |   8%  |                                                                              |=======                                                               |  10%  |                                                                              |========                                                              |  12%  |                                                                              |==========                                                            |  14%  |                                                                              |===========                                                           |  16%  |                                                                              |=============                                                         |  18%  |                                                                              |==============                                                        |  20%  |                                                                              |===============                                                       |  22%  |                                                                              |=================                                                     |  24%  |                                                                              |==================                                                    |  26%  |                                                                              |====================                                                  |  28%  |                                                                              |=====================                                                 |  30%  |                                                                              |======================                                                |  32%  |                                                                              |========================                                              |  34%  |                                                                              |=========================                                             |  36%  |                                                                              |===========================                                           |  38%  |                                                                              |============================                                          |  40%  |                                                                              |=============================                                         |  42%  |                                                                              |===============================                                       |  44%  |                                                                              |================================                                      |  46%  |                                                                              |==================================                                    |  48%  |                                                                              |===================================                                   |  50%  |                                                                              |====================================                                  |  52%  |                                                                              |======================================                                |  54%  |                                                                              |=======================================                               |  56%  |                                                                              |=========================================                             |  58%  |                                                                              |==========================================                            |  60%  |                                                                              |===========================================                           |  62%  |                                                                              |=============================================                         |  64%  |                                                                              |==============================================                        |  66%  |                                                                              |================================================                      |  68%  |                                                                              |=================================================                     |  70%  |                                                                              |==================================================                    |  72%  |                                                                              |====================================================                  |  74%  |                                                                              |=====================================================                 |  76%  |                                                                              |=======================================================               |  78%  |                                                                              |========================================================              |  80%  |                                                                              |=========================================================             |  82%  |                                                                              |===========================================================           |  84%  |                                                                              |============================================================          |  86%  |                                                                              |==============================================================        |  88%  |                                                                              |===============================================================       |  90%  |                                                                              |================================================================      |  92%  |                                                                              |==================================================================    |  94%  |                                                                              |===================================================================   |  96%  |                                                                              |===================================================================== |  98%  |                                                                              |======================================================================| 100%</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> </span>
 <span class="r-msg co"><span class="r-pr">#&gt;</span> </span>
-<span class="r-msg co"><span class="r-pr">#&gt;</span>  28  significant results @  BH &lt; 0.05</span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span>  132 significant results @  BH &lt; 0.05</span>
 </code></pre></div>
     </div>
   </div>
