@@ -2,8 +2,7 @@ filter_matrices <- function(X_list,
                             coln_min = 1,
                             rown_min = 1,
                             colsum_min = 0,
-                            rowsum_min = 0,
-                            return_features = TRUE,
+                            rowsum_min = 0, 
                             verbose = TRUE){
 
   features <- feature_intersect(X_list,
@@ -16,8 +15,5 @@ filter_matrices <- function(X_list,
                   rowsum_min = rowsum_min,
                   features = features)
   })
-  if (return_features) {
-    out$features <- features
-  }
   return(out)
 }

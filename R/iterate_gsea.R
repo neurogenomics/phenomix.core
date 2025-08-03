@@ -15,6 +15,7 @@
 #' @importFrom dplyr mutate
 #' @importFrom stats p.adjust
 #' @importFrom methods slot is
+#' @importFrom utils tail
 #' @examples
 #' set.seed(42)
 #' 
@@ -33,8 +34,10 @@ iterate_gsea <- function(xmat,
                          qvalue_thresh = .05,
                          quantize = list(x=10,
                                          y=10),
-                         use_quantiles = list(x=2,
-                                              y=2),
+                         # Use the top 2 quantiles by default
+                         use_quantiles = list(x=utils::tail(seq(quantize$x),2),
+                                              y=utils::tail(seq(quantize$y),2)
+                                              ),
                          progressbar = TRUE,
                          workers = 1,
                          verbose = TRUE) {
@@ -70,6 +73,12 @@ iterate_gsea <- function(xmat,
                                 n=quantize$y,
                                 verbose = verbose)
     }
+    
+   
+    # Get feature intersect again after filtering and quantizing
+    features <- feature_intersect(list(xmat=xmat,
+                                       ymat=ymat),
+                                    verbose = verbose)  
 
     
     gsea_res <- BiocParallel::bplapply(
@@ -80,15 +89,15 @@ iterate_gsea <- function(xmat,
             
         tt <- colnames(ymat)[i]
         if(!progressbar){
-            messager("-",tt,": (",i,"/",ncol(xmat),")",
+            messager("-",tt,": (",i,"/",ncol(ymat),")",
                      parallel=TRUE)
         }
         
         lapply(colnames(xmat), function(ct) { 
             dat <- data.frame(
-                x = xmat[X_list$features, ct],
-                y = ymat[X_list$features, tt],
-                row.names = X_list$features
+                x = xmat[features, ct],
+                y = ymat[features, tt],
+                row.names = features
             )
             res <- GeneOverlap::newGeneOverlap(
                 listA = rownames(subset(dat, x %in% use_quantiles$x)),

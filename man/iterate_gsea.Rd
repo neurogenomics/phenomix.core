@@ -10,7 +10,8 @@ iterate_gsea(
   correction_method = "BH",
   qvalue_thresh = 0.05,
   quantize = list(x = 10, y = 10),
-  use_quantiles = list(x = 2, y = 2),
+  use_quantiles = list(x = utils::tail(seq(quantize$x), 2), y =
+    utils::tail(seq(quantize$y), 2)),
   progressbar = TRUE,
   workers = 1,
   verbose = TRUE

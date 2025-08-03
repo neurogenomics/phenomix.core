@@ -28,7 +28,7 @@ iterate_lm_long <- function(xmat,
     FUN = function(i) {
       tt <- colnames(ymat)[i]
       if(!progressbar){
-        messager("-",tt,": (",i,"/",ncol(xmat),")",
+        messager("-",tt,": (",i,"/",ncol(ymat),")",
                  parallel=TRUE)
       }
       #### Long format ####
